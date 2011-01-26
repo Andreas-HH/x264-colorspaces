@@ -128,33 +128,33 @@ typedef union { x264_uint128_t i; uint64_t a[2]; uint32_t b[4]; uint16_t c[8]; u
 
 #define CPPIXEL_X4(dst,src) MPIXEL_X4(dst) = MPIXEL_X4(src)
 
-#define X264_SCAN8_SIZE (6*8)
+#define X264_SCAN8_SIZE (16*8)
 #define X264_SCAN8_LUMA_SIZE (5*8)
 #define X264_SCAN8_0 (4+1*8)
 
-static const int x264_scan8[16+2*4+3] =
+/*static const int x264_scan8[16+2*4+3] =
 {
-    /* Luma */
+//      Luma 
     4+1*8, 5+1*8, 4+2*8, 5+2*8,
     6+1*8, 7+1*8, 6+2*8, 7+2*8,
     4+3*8, 5+3*8, 4+4*8, 5+4*8,
     6+3*8, 7+3*8, 6+4*8, 7+4*8,
 
-    /* Cb */
+//      Cb 
     1+1*8, 2+1*8,
     1+2*8, 2+2*8,
 
-    /* Cr */
+//      Cr 
     1+4*8, 2+4*8,
     1+5*8, 2+5*8,
 
-    /* Luma DC */
+//      Luma DC 
     4+5*8,
 
-    /* Chroma DC */
+//      Chroma DC 
     6+5*8, 7+5*8
 };
-/*
+/
    0 1 2 3 4 5 6 7
  0
  1   B B   L L L L
@@ -163,6 +163,53 @@ static const int x264_scan8[16+2*4+3] =
  4   R R   L L L L
  5   R R   Dy  DuDv
 */
+
+static const int x264_scan8[16+2*8+3] =
+{
+//      Luma 
+    4+1*8, 5+1*8, 4+2*8, 5+2*8,
+    6+1*8, 7+1*8, 6+2*8, 7+2*8,
+    4+3*8, 5+3*8, 4+4*8, 5+4*8,
+    6+3*8, 7+3*8, 6+4*8, 7+4*8,
+
+//      Cb 
+    4+6*8, 5+6*8,
+    4+7*8, 5+7*8,
+    4+8*8, 5+8*8,
+    4+9*8, 5+9*8,
+
+//      Cr 
+    4+12*8, 5+12*8,
+    4+13*8, 5+13*8,
+    4+14*8, 5+14*8,
+    4+15*8, 5+15*8,
+
+//      Luma DC 
+    1+1*8,
+
+//      Chroma DC 
+    1+2*8, 1+3*8
+};
+/*
+   0 1 2 3 4 5 6 7
+ 0
+ 1   Dy    L L L L
+ 2   Du    L L L L
+ 3   Dv    L L L L
+ 4         L L L L
+ 5 
+ 6         B B
+ 7         B B
+ 8         B B
+ 9         B B
+ 10       
+ 11
+ 12        R R
+ 13        R R
+ 14        R R
+ 15        R R
+*/
+
 
 #include "x264.h"
 #include "bitstream.h"
@@ -528,10 +575,10 @@ struct x264_t
     struct
     {
         ALIGNED_16( dctcoef luma16x16_dc[16] );
-        ALIGNED_16( dctcoef chroma_dc[2][4] );
+        ALIGNED_16( dctcoef chroma_dc[2][8] );
         // FIXME share memory?
         ALIGNED_16( dctcoef luma8x8[4][64] );
-        ALIGNED_16( dctcoef luma4x4[16+8][16] );
+        ALIGNED_16( dctcoef luma4x4[16+2*8][16] );
     } dct;
 
     /* MB table and cache for current frame/mb */
@@ -603,7 +650,7 @@ struct x264_t
         int16_t *cbp;                       /* mb cbp: 0x0?: luma, 0x?0: chroma, 0x100: luma dc, 0x0200 and 0x0400: chroma dc  (all set for PCM)*/
         int8_t  (*intra4x4_pred_mode)[8];   /* intra4x4 pred mode. for non I4x4 set to I_PRED_4x4_DC(2) */
                                             /* actually has only 7 entries; set to 8 for write-combining optimizations */
-        uint8_t (*non_zero_count)[16+4+4];  /* nzc. for I_PCM set to 16 */
+        uint8_t (*non_zero_count)[16+8+8];  /* nzc. for I_PCM set to 16 */
         int8_t  *chroma_pred_mode;          /* chroma_pred_mode. cabac only. for non intra I_PRED_CHROMA_DC(0) */
         int16_t (*mv[2])[2];                /* mb mv. set to 0 for intra mb */
         uint8_t (*mvd[2])[8][2];            /* absolute value of mb mv difference with predict, clipped to [0,33]. set to 0 if intra. cabac only */

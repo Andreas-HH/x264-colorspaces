@@ -659,7 +659,7 @@ void x264_macroblock_cache_load( x264_t *h, int mb_x, int mb_y )
     /* GCC pessimizes direct loads from heap-allocated arrays due to aliasing. */
     /* By only dereferencing them once, we avoid this issue. */
     int8_t (*i4x4)[8] = h->mb.intra4x4_pred_mode;
-    uint8_t (*nnz)[24] = h->mb.non_zero_count;
+    uint8_t (*nnz)[16+2*8] = h->mb.non_zero_count;
     int16_t *cbp = h->mb.cbp;
 
     /* load cache */
@@ -672,8 +672,8 @@ void x264_macroblock_cache_load( x264_t *h, int mb_x, int mb_y )
         /* load non_zero_count */
         CP32( &h->mb.cache.non_zero_count[x264_scan8[0] - 8], &nnz[top][12] );
         /* shift because x264_scan8[16] is misaligned */
-        M32( &h->mb.cache.non_zero_count[x264_scan8[16+0] - 9] ) = M16( &nnz[top][18] ) << 8;
-        M32( &h->mb.cache.non_zero_count[x264_scan8[16+4] - 9] ) = M16( &nnz[top][22] ) << 8;
+        M32( &h->mb.cache.non_zero_count[x264_scan8[16+0] - 9] ) = M16( &nnz[top][22] ) << 8;
+        M32( &h->mb.cache.non_zero_count[x264_scan8[16+8] - 9] ) = M16( &nnz[top][30] ) << 8;
 
         /* Finish the prefetching */
         for( int l = 0; l < lists; l++ )
@@ -696,7 +696,7 @@ void x264_macroblock_cache_load( x264_t *h, int mb_x, int mb_y )
         /* load non_zero_count */
         M32( &h->mb.cache.non_zero_count[x264_scan8[   0] - 8] ) = 0x80808080U;
         M32( &h->mb.cache.non_zero_count[x264_scan8[16+0] - 9] ) = 0x80808080U;
-        M32( &h->mb.cache.non_zero_count[x264_scan8[16+4] - 9] ) = 0x80808080U;
+        M32( &h->mb.cache.non_zero_count[x264_scan8[16+8] - 9] ) = 0x80808080U;
     }
 
     if( h->mb.i_neighbour & MB_LEFT )
@@ -717,9 +717,13 @@ void x264_macroblock_cache_load( x264_t *h, int mb_x, int mb_y )
 
         h->mb.cache.non_zero_count[x264_scan8[16+0] - 1] = nnz[left][16+1];
         h->mb.cache.non_zero_count[x264_scan8[16+2] - 1] = nnz[left][16+3];
+	h->mb.cache.non_zero_count[x264_scan8[16+4] - 1] = nnz[left][16+5];
+        h->mb.cache.non_zero_count[x264_scan8[16+6] - 1] = nnz[left][16+7];
 
-        h->mb.cache.non_zero_count[x264_scan8[16+4+0] - 1] = nnz[left][16+4+1];
-        h->mb.cache.non_zero_count[x264_scan8[16+4+2] - 1] = nnz[left][16+4+3];
+        h->mb.cache.non_zero_count[x264_scan8[16+8+0] - 1] = nnz[left][16+8+1];
+        h->mb.cache.non_zero_count[x264_scan8[16+8+2] - 1] = nnz[left][16+8+3];
+	h->mb.cache.non_zero_count[x264_scan8[16+8+4] - 1] = nnz[left][16+8+5];
+        h->mb.cache.non_zero_count[x264_scan8[16+8+6] - 1] = nnz[left][16+8+7];
     }
     else
     {
@@ -737,8 +741,12 @@ void x264_macroblock_cache_load( x264_t *h, int mb_x, int mb_y )
         h->mb.cache.non_zero_count[x264_scan8[10] - 1] =
         h->mb.cache.non_zero_count[x264_scan8[16+0] - 1] =
         h->mb.cache.non_zero_count[x264_scan8[16+2] - 1] =
-        h->mb.cache.non_zero_count[x264_scan8[16+4+0] - 1] =
-        h->mb.cache.non_zero_count[x264_scan8[16+4+2] - 1] = 0x80;
+        h->mb.cache.non_zero_count[x264_scan8[16+4] - 1] =
+        h->mb.cache.non_zero_count[x264_scan8[16+6] - 1] =
+        h->mb.cache.non_zero_count[x264_scan8[16+8+0] - 1] =
+        h->mb.cache.non_zero_count[x264_scan8[16+8+2] - 1] = 
+        h->mb.cache.non_zero_count[x264_scan8[16+8+4] - 1] =
+        h->mb.cache.non_zero_count[x264_scan8[16+8+6] - 1] = 0x80;
     }
 
     if( h->pps->b_transform_8x8_mode )
@@ -1184,6 +1192,10 @@ void x264_macroblock_cache_save( x264_t *h )
     M16( &nnz[16+1*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+1*2]-1] ) >> 8;
     M16( &nnz[16+2*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+2*2]-1] ) >> 8;
     M16( &nnz[16+3*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+3*2]-1] ) >> 8;
+    M16( &nnz[16+0*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+4*2]-1] ) >> 8;
+    M16( &nnz[16+1*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+5*2]-1] ) >> 8;
+    M16( &nnz[16+2*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+6*2]-1] ) >> 8;
+    M16( &nnz[16+3*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+7*2]-1] ) >> 8;
 
     if( h->mb.i_cbp_luma == 0 && h->mb.i_type != I_8x8 )
         h->mb.b_transform_8x8 = 0;

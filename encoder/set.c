@@ -115,6 +115,7 @@ void x264_sps_init( x264_sps_t *sps, int i_id, x264_param_t *param )
     else
         sps->i_profile_idc  = PROFILE_BASELINE;
 
+    sps->i_profile_idc  = PROFILE_HIGH422;
     sps->b_constraint_set0  = sps->i_profile_idc == PROFILE_BASELINE;
     /* x264 doesn't support the features that are in Baseline and not in Main,
      * namely arbitrary_slice_order and slice_groups. */
@@ -284,7 +285,8 @@ void x264_sps_write( bs_t *s, x264_sps_t *sps )
 
     if( sps->i_profile_idc >= PROFILE_HIGH )
     {
-        bs_write_ue( s, 1 ); // chroma_format_idc = 4:2:0
+//         bs_write_ue( s, 1 ); // chroma_format_idc = 4:2:0
+        bs_write_ue( s, 2 ); // chroma_format_idc = 4:2:2
         bs_write_ue( s, BIT_DEPTH-8 ); // bit_depth_luma_minus8
         bs_write_ue( s, BIT_DEPTH-8 ); // bit_depth_chroma_minus8
         bs_write( s, 1, sps->b_qpprime_y_zero_transform_bypass );
