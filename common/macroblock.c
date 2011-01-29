@@ -1192,10 +1192,10 @@ void x264_macroblock_cache_save( x264_t *h )
     M16( &nnz[16+1*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+1*2]-1] ) >> 8;
     M16( &nnz[16+2*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+2*2]-1] ) >> 8;
     M16( &nnz[16+3*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+3*2]-1] ) >> 8;
-    M16( &nnz[16+0*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+4*2]-1] ) >> 8;
-    M16( &nnz[16+1*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+5*2]-1] ) >> 8;
-    M16( &nnz[16+2*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+6*2]-1] ) >> 8;
-    M16( &nnz[16+3*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+7*2]-1] ) >> 8;
+    M16( &nnz[16+4*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+4*2]-1] ) >> 8;
+    M16( &nnz[16+5*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+5*2]-1] ) >> 8;
+    M16( &nnz[16+6*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+6*2]-1] ) >> 8;
+    M16( &nnz[16+7*2] ) = M32( &h->mb.cache.non_zero_count[x264_scan8[16+7*2]-1] ) >> 8;
 
     if( h->mb.i_cbp_luma == 0 && h->mb.i_type != I_8x8 )
         h->mb.b_transform_8x8 = 0;
