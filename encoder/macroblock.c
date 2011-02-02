@@ -588,7 +588,7 @@ void x264_macroblock_encode( x264_t *h )
     int b_force_no_skip = 0;
     int nz;
     h->mb.i_cbp_luma = 0;
-    h->mb.cache.non_zero_count[x264_scan8[24]] = 0;
+    h->mb.cache.non_zero_count[x264_scan8[32]] = 0;
 
     if( h->mb.i_type == I_PCM )
     {

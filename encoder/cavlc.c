@@ -218,7 +218,7 @@ static const uint8_t ct_index[17] = {0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,3};
 
 #define block_residual_write_cavlc(h,cat,idx,l)\
 {\
-    int nC = cat == DCT_CHROMA_DC ? 4 : ct_index[x264_mb_predict_non_zero_code( h, cat == DCT_LUMA_DC ? 0 : idx )];\
+    int nC = cat == DCT_CHROMA_DC ? 5 : ct_index[x264_mb_predict_non_zero_code( h, cat == DCT_LUMA_DC ? 0 : idx )];\
     uint8_t *nnz = &h->mb.cache.non_zero_count[x264_scan8[idx]];\
     if( !*nnz )\
         bs_write_vlc( &h->out.bs, x264_coeff0_token[nC] );\
@@ -364,7 +364,7 @@ void x264_macroblock_write_cavlc( x264_t *h )
     }
 #endif
 
-//     h->mb.i_chroma_pred_mode = 0;
+//     h->mb.i_chroma_pred_mode = 2;
 
     /* Write:
       - type
@@ -554,10 +554,10 @@ void x264_macroblock_write_cavlc( x264_t *h )
 
 	printf("writing luma dc\n");
 	
-	*(&h->mb.cache.non_zero_count[x264_scan8[32]]) = 5;
+// 	*(&h->mb.cache.non_zero_count[x264_scan8[32]]) = 6;
         /* DC Luma */
-	for (int j = 0; j < 16; j++) 
-		  h->dct.luma16x16_dc[j] = new_luma_dc[j];
+// 	for (int j = 0; j < 16; j++) 
+// 		  h->dct.luma16x16_dc[j] = new_luma_dc[j];
         block_residual_write_cavlc( h, DCT_LUMA_DC, 32 , h->dct.luma16x16_dc );
 	 
         /* AC Luma */
@@ -586,8 +586,8 @@ void x264_macroblock_write_cavlc( x264_t *h )
 	    h->dct.chroma_dc[0][j] = new_chroma_dc[j];
 	    h->dct.chroma_dc[1][j] = new_chroma_dc[j];
 	}
-	*(&h->mb.cache.non_zero_count[x264_scan8[33]]) = 3;
-	*(&h->mb.cache.non_zero_count[x264_scan8[34]]) = 3;
+	*(&h->mb.cache.non_zero_count[x264_scan8[33]]) = 4;
+	*(&h->mb.cache.non_zero_count[x264_scan8[34]]) = 4;
 	block_residual_write_cavlc( h, DCT_CHROMA_DC, 33, h->dct.chroma_dc[0] );
 	block_residual_write_cavlc( h, DCT_CHROMA_DC, 34, h->dct.chroma_dc[1] );
 // 	}
@@ -600,7 +600,7 @@ void x264_macroblock_write_cavlc( x264_t *h )
 		for (int j = 0; j < 16; j++) {
 		    h->dct.luma4x4[i][j] = new_chroma_ac[j];
 		}
-		*(&h->mb.cache.non_zero_count[x264_scan8[i]]) = 5;
+		*(&h->mb.cache.non_zero_count[x264_scan8[i]]) = 6;
                 block_residual_write_cavlc( h, DCT_CHROMA_AC, i, h->dct.luma4x4[i]+1 );
 // 		block_residual_write_cavlc( h, DCT_CHROMA_AC, i, h->dct.luma4x4[i]+1 );
 	    }
