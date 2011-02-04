@@ -227,6 +227,10 @@ static int x264_coeff_last4( dctcoef *l )
 {
     return x264_coeff_last_internal( l, 4 );
 }
+static int x264_coeff_last8( dctcoef *l )
+{
+    return x264_coeff_last_internal( l, 8 );
+}
 static int x264_coeff_last15( dctcoef *l )
 {
     return x264_coeff_last_internal( l, 15 );
@@ -257,6 +261,7 @@ static int x264_coeff_level_run##num( dctcoef *dct, x264_run_level_t *runlevel )
 }
 
 level_run(4)
+level_run(8)
 level_run(15)
 level_run(16)
 
@@ -277,11 +282,13 @@ void x264_quant_init( x264_t *h, int cpu, x264_quant_function_t *pf )
     pf->decimate_score16 = x264_decimate_score16;
     pf->decimate_score64 = x264_decimate_score64;
 
-    pf->coeff_last[DCT_CHROMA_DC] = x264_coeff_last4;
+//     pf->coeff_last[DCT_CHROMA_DC] = x264_coeff_last4;
+    pf->coeff_last[DCT_CHROMA_DC] = x264_coeff_last8;
     pf->coeff_last[  DCT_LUMA_AC] = x264_coeff_last15;
     pf->coeff_last[ DCT_LUMA_4x4] = x264_coeff_last16;
     pf->coeff_last[ DCT_LUMA_8x8] = x264_coeff_last64;
-    pf->coeff_level_run[DCT_CHROMA_DC] = x264_coeff_level_run4;
+//     pf->coeff_level_run[DCT_CHROMA_DC] = x264_coeff_level_run4;
+    pf->coeff_level_run[DCT_CHROMA_DC] = x264_coeff_level_run8;
     pf->coeff_level_run[  DCT_LUMA_AC] = x264_coeff_level_run15;
     pf->coeff_level_run[ DCT_LUMA_4x4] = x264_coeff_level_run16;
 
@@ -429,4 +436,7 @@ void x264_quant_init( x264_t *h, int cpu, x264_quant_function_t *pf )
     pf->coeff_last[DCT_CHROMA_AC] = pf->coeff_last[ DCT_LUMA_AC];
     pf->coeff_level_run[  DCT_LUMA_DC] = pf->coeff_level_run[DCT_LUMA_4x4];
     pf->coeff_level_run[DCT_CHROMA_AC] = pf->coeff_level_run[ DCT_LUMA_AC];
+    
+    pf->coeff_last[DCT_CHROMA_DC] = x264_coeff_last8;
+    pf->coeff_level_run[DCT_CHROMA_DC] = x264_coeff_level_run8;
 }

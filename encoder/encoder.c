@@ -1919,8 +1919,8 @@ static int x264_slice_write( x264_t *h )
         /* encode this macroblock -> be careful it can change the mb type to P_SKIP if needed */
         x264_macroblock_encode( h );
 	
-	h->mb.i_chroma_pred_mode = 2;
-	h->mb.i_cbp_chroma = 0;
+// 	h->mb.i_chroma_pred_mode = 2;
+// 	h->mb.i_cbp_chroma = 0;
 
         if( h->param.b_cabac )
         {
