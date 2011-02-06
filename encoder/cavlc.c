@@ -303,9 +303,9 @@ static inline void x264_macroblock_luma_write_cavlc( x264_t *h, int i8start, int
     for( int i8 = i8start; i8 <= i8end; i8++ )
         if( h->mb.i_cbp_luma & (1 << i8) )
             for( int i4 = 0; i4 < 4; i4++ ) {
-// 		*(&h->mb.cache.non_zero_count[x264_scan8[i4+i8*4]]) = 6;
-// 		for (int j = 0; j < 16; j++) 
-// 		  h->dct.luma4x4[i4+i8*4][j] = new_luma_4x4[j];
+		*(&h->mb.cache.non_zero_count[x264_scan8[i4+i8*4]]) = 6;
+		for (int j = 0; j < 16; j++) 
+		  h->dct.luma4x4[i4+i8*4][j] = new_luma_4x4[j];
                 block_residual_write_cavlc( h, DCT_LUMA_4x4, i4+i8*4, h->dct.luma4x4[i4+i8*4] );
 	    }
 }
@@ -560,19 +560,19 @@ void x264_macroblock_write_cavlc( x264_t *h )
 
 	printf("writing luma dc\n");
 	
-// 	*(&h->mb.cache.non_zero_count[x264_scan8[32]]) = 6;
+	*(&h->mb.cache.non_zero_count[x264_scan8[32]]) = 6;
         /* DC Luma */
-// 	for (int j = 0; j < 16; j++) 
-// 		  h->dct.luma16x16_dc[j] = new_luma_acdc[j];
+	for (int j = 0; j < 16; j++) 
+		  h->dct.luma16x16_dc[j] = new_luma_acdc[j];
         block_residual_write_cavlc( h, DCT_LUMA_DC, 32 , h->dct.luma16x16_dc );
 	 
         /* AC Luma */
         if( h->mb.i_cbp_luma )
 	    printf("writing LUMA_AC\n");
             for( int i = 0; i < 16; i++ ) {
-// 	        *(&h->mb.cache.non_zero_count[x264_scan8[i]]) = 6;
-// 		for (int j = 0; j < 16; j++) 
-// 		  h->dct.luma4x4[i][j] = new_luma_acdc[j];
+	        *(&h->mb.cache.non_zero_count[x264_scan8[i]]) = 6;
+		for (int j = 0; j < 16; j++) 
+		  h->dct.luma4x4[i][j] = new_luma_acdc[j];
                 block_residual_write_cavlc( h, DCT_LUMA_AC, i, h->dct.luma4x4[i]+1 );
 	    }
     }
