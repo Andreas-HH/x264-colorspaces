@@ -1827,6 +1827,7 @@ static inline void x264_slice_init( x264_t *h, int i_nal_type, int i_global_qp )
 
 static int x264_slice_write( x264_t *h )
 {
+    printf("slice write!\n");
     int i_skip;
     int mb_xy, i_mb_x, i_mb_y;
     int i_skip_bak = 0; /* Shut up GCC. */
@@ -1919,7 +1920,7 @@ static int x264_slice_write( x264_t *h )
         /* encode this macroblock -> be careful it can change the mb type to P_SKIP if needed */
         x264_macroblock_encode( h );
 	
-	h->mb.i_chroma_pred_mode = 0;
+// 	h->mb.i_chroma_pred_mode = 0;
 // 	h->mb.i_intra16x16_pred_mode = 4;
 // 	h->mb.i_cbp_chroma = 0;
 

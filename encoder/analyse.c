@@ -553,6 +553,7 @@ static const int8_t i4x4_mode_available[2][5][10] =
 static ALWAYS_INLINE const int8_t *predict_16x16_mode_available( int i_neighbour )
 {
     int idx = i_neighbour & (MB_TOP|MB_LEFT|MB_TOPLEFT);
+    printf("%i *** %i\n", idx, (idx&MB_TOPLEFT)?4:idx);
     return i16x16_mode_available[(idx&MB_TOPLEFT)?4:idx];
 }
 
@@ -683,6 +684,8 @@ static void x264_mb_analyse_intra( x264_t *h, x264_mb_analysis_t *a, int i_satd_
 
     /* Not heavily tuned */
     static const uint8_t i16x16_thresh_lut[11] = { 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4 };
+
+
     int i16x16_thresh = a->b_fast_intra ? (i16x16_thresh_lut[h->mb.i_subpel_refine]*i_satd_inter)>>1 : COST_MAX;
 
     if( !h->mb.b_lossless && predict_mode[3] >= 0 )
